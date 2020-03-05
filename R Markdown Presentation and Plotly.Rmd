@@ -1,0 +1,57 @@
+---
+title: "R Markdown Presentation & Plotly"
+author: "Qian Xu"
+date: "March 5, 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Tracking Coronavirus Cases in the U.S.
+
+```{r, comment = ""}
+date <- Sys.Date()-1
+```
+Data by `r date` came from https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html
+
+```{r, message = FALSE}
+library(plotly)
+# Create data frame
+states <- data.frame(name = c("California", "Washington", "Nebraska", "Texas", "Illinois", "Florida", "Arizona", "Massachusetts", "Oregon", "Rhode Island", "New York", "New Hampshire", "Georgia", "Wisconsin", "Utah", "North Carolina"),
+                     cases = c(40, 30, 13, 11, 4, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1))
+states <- data.frame(name = state.abb, cases = numeric(50))
+states$cases[states$name=="CA"] <- 51
+states$cases[states$name=="WA"] <- 44
+states$cases[states$name=="NE"] <- 13
+states$cases[states$name=="TX"] <- 11
+states$cases[states$name=="NY"] <- 11
+states$cases[states$name=="IL"] <- 4
+states$cases[states$name=="FL"] <- 3
+states$cases[states$name=="AZ"] <- 2
+states$cases[states$name=="MA"] <- 2
+states$cases[states$name=="OR"] <- 2
+states$cases[states$name=="RI"] <- 2
+states$cases[states$name=="NH"] <- 2
+states$cases[states$name=="GA"] <- 2
+states$cases[states$name=="WI"] <- 1
+states$cases[states$name=="UT"] <- 1
+states$cases[states$name=="NC"] <- 1
+# Create hover text
+states$hover <- with(states, paste(name, '<br>', "cases:", cases))
+# Make state borders white
+borders <- list(color = toRGB("red"))
+# Set up some mapping options
+map_options <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+plot_ly(z = ~states$cases, text = ~states$hover, locations = ~states$name, 
+        type = 'choropleth', locationmode = 'USA-states', 
+        color = ~states$cases, colors = 'Blues', marker = list(line = borders)) %>%
+  layout(title = 'Tracking Coronavirus Cases in the U.S.', geo = map_options)
+```
